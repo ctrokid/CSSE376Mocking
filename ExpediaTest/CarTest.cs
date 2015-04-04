@@ -33,7 +33,8 @@ namespace ExpediaTest
 		[TestMethod]
 		public void TestThatCarHasCorrectBasePriceForTenDays()
 		{
-            var target = new Car(10);
+            var target = ObjectMother.BMW();
+            Assert.AreEqual("It's a BMW!", target.Name);
 			Assert.AreEqual(80, target.getBasePrice());	
 		}
 		
@@ -50,5 +51,53 @@ namespace ExpediaTest
 		{
 			new Car(-5);
 		}
+
+        [TestMethod()]
+        public void TestThatCarCanGetLocation()
+        {
+            IDatabase mockDB = mocks.StrictMock<IDatabase>();
+
+            Expect.Call(mockDB.getCarLocation(7)).Return("On the racetrack");
+            Expect.Call(mockDB.getCarLocation(13)).Return("Towing from accident");
+            Expect.Call(mockDB.getCarLocation(69)).Return("I-70");
+
+            mocks.ReplayAll();
+
+            Car target = new Car(10);
+            target.Database = mockDB;
+
+            String result;
+
+            result = target.getCarLocation(7);
+            Assert.AreEqual(result, "On the racetrack");
+
+            result = target.getCarLocation(13);
+            Assert.AreEqual(result, "Towing from accident");
+
+            result = target.getCarLocation(69);
+            Assert.AreEqual(result, "I-70");
+
+            mocks.VerifyAll();
+        }
+        
+        [TestMethod()]
+        public void TestThatCarDoesMileageCount()
+        {
+            IDatabase mockDB = mocks.StrictMock<IDatabase>();
+            int mileage = 1000;
+
+            Expect.Call(mockDB.Miles).PropertyBehavior();
+
+            mocks.ReplayAll();
+
+            mockDB.Miles = mileage;
+
+            var target = new Car(10);
+            target.Database = mockDB;
+
+            int expectMiles = target.Mileage;
+            Assert.AreEqual(expectMiles, mileage);
+            mocks.VerifyAll();
+        }
 	}
 }
